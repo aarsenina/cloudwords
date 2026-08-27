@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Облако слов Учи.ру</title>
+  <style>
+    @font-face { font-family: 'Factor A'; src: url('TRIAL_FactorA-Regular.otf') format('opentype'); }
+    @font-face { font-family: 'Factor A'; src: url('TRIAL_FactorA-Bold.otf') format('opentype'); font-weight: bold; }
+    
+    body {
+      font-family: 'Factor A', sans-serif;
+      background-color: #1A1635;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+    
+    #cloud-container {
+      width: 90%;
+      height: 90%;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-content: center;
+      gap: 15px;
+    }
+
+    .word {
+      display: inline-block;
+      font-weight: bold;
+      line-height: 1;
+      text-transform: uppercase;
+      /* Плавное изменение размера и цвета */
+      transition: all 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+      animation: float 4s ease-in-out infinite alternate;
+    }
+
+    /* Немного "живой" анимации парения */
+    @keyframes float {
+      0% { transform: translateY(0px) rotate(0deg); }
+      100% { transform: translateY(-5px) rotate(1deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="cloud-container"></div>
+
+  <script>
+    // Вставлен твой URL
+    const scriptURL = 'https://script.google.com/macros/s/AKfycby6UAPwoqZQlQcjzRdY7jL0XY6CykpZ9yhDksu5ese64l4OMcEGsM8PaVDscmPfTBqA/exec'; 
+    const container = document.getElementById('cloud-container');
+    
+    let currentWords = {};
+
+    function fetchWords() {
+      fetch(scriptURL)
+        .then(res => res.json())
+        .then(data => {
+          updateCloud(data);
+        })
+        .catch(err => console.error("Ошибка обновления:", err));
+    }
+
+    function updateCloud(newData) {
+      // Ищем максимальное количество повторений, чтобы рассчитать размер шрифта
+      let maxCount = 1;
+      for (let word in newData) {
+        if (newData[word] > maxCount) maxCount = newData[word];
+      }
+
+      for (let word in newData) {
+        let count = newData[word];
+        let el = document.getElementById('word-' + word);
+        
+        // Расчет размера: от 2vh (минимум) до 12vh (максимум)
+        let fontSize = 2 + (count / maxCount) * 10;
+        
+        // Расцветка: популярные - салатовые, обычные - белые/фиолетовые
+        let color = '#FFFFFF';
+        if (count === maxCount && count > 1) color = '#B4F828';
+        else if (count > maxCount * 0.5) color = '#DCFF85';
+        else if (count > 1) color = '#A498FF';
+
+        if (!el) {
+          // Если слова еще нет - создаем
+          el = document.createElement('div');
+          el.id = 'word-' + word;
+          el.className = 'word';
+          el.textContent = word;
+          
+          // Случайная задержка анимации, чтобы слова двигались вразнобой
+          el.style.animationDelay = (Math.random() * 2) + 's';
+          
+          container.appendChild(el);
+        }
+        
+        // Применяем новые размеры и цвета
+        el.style.fontSize = fontSize + 'vh';
+        el.style.color = color;
+      }
+    }
+
+    // Обновляем облако каждые 4 секунды
+    setInterval(fetchWords, 4000);
+    fetchWords();
+  </script>
+</body>
+</html>
