@@ -74,7 +74,6 @@
   </div>
 
   <script>
-    // Вставлен твой URL
     const scriptURL = 'https://script.google.com/macros/s/AKfycby6UAPwoqZQlQcjzRdY7jL0XY6CykpZ9yhDksu5ese64l4OMcEGsM8PaVDscmPfTBqA/exec'; 
     
     const form = document.getElementById('wordForm');
@@ -93,7 +92,8 @@
       const formData = new URLSearchParams();
       formData.append('word', word);
 
-      fetch(scriptURL, { method: 'POST', body: formData })
+      // Добавлен режим mode: 'no-cors' для обхода блокировок Safari
+      fetch(scriptURL, { method: 'POST', body: formData, mode: 'no-cors' })
         .then(() => {
           msg.textContent = 'Слово улетело на экран! ✨';
           msg.style.color = '#DCFF85';
