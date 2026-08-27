@@ -89,11 +89,10 @@
       btn.disabled = true;
       btn.textContent = 'Отправляем...';
       
-      const formData = new URLSearchParams();
-      formData.append('word', word);
+      // Перевод на GET-запрос: браузеры и Safari пропускают его без CORS-блокировок
+      const sendUrl = scriptURL + '?word=' + encodeURIComponent(word);
 
-      // Добавлен режим mode: 'no-cors' для обхода блокировок Safari
-      fetch(scriptURL, { method: 'POST', body: formData, mode: 'no-cors' })
+      fetch(sendUrl, { mode: 'no-cors' })
         .then(() => {
           msg.textContent = 'Слово улетело на экран! ✨';
           msg.style.color = '#DCFF85';
